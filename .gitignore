@@ -1,3 +1,23 @@
+# java
+*.class
+
+# android
+android/AndroidManifest.xml
+android/gen/
+android/libs/
+
 # gradle
 .gradle/
 build/
+core/build/
+desktop/build/
+android/build/
+
+# eclipse
+*.settings/
+*.classpath
+*.project
+
+# intellij
+*.idea/
+*.iml

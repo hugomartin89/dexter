@@ -1,0 +1,36 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/releases/"
+        }
+    }
+    dependencies {
+        classpath "com.android.tools.build:gradle:1.2.3"
+    }
+}
+
+allprojects {
+    version = "0.1.0"
+
+    ext {
+        packageName = "tk.hugomartin89.dexter"
+        appName = "Dexter"
+        gdxVersion = '1.4.1'
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://oss.sonatype.org/content/repositories/releases/"
+        }
+    }
+}
+
+project(":android") {
+    ext {
+        androidToolsVersion = "21.1.1"
+        androidSdkVersion = "22"
+        androidVersionCode = "1"
+    }
+}
