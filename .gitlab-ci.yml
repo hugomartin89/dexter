@@ -1,0 +1,76 @@
+image: openjdk:8
+
+stages:
+  - test
+  - build
+  - pack
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - mkdir dist
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+check:all:
+  stage: test
+  script:
+    - ./gradlew check
+
+build:android:
+  stage: build
+  only:
+    - master
+
+  artifacts:
+    paths:
+      - android/build/outputs/apk/app-debug.apk
+    expire_in: 1 week
+
+  script:
+    - ./gradlew android:assembleDebug
+
+build:desktop:
+  stage: build
+  only:
+    - master
+
+  artifacts:
+    paths:
+      - desktop/build/libs/*.jar
+    expire_in: 1 week
+
+  script:
+    - ./gradlew desktop:dist
+
+pack:all:
+  stage: pack
+  dependencies:
+    - build:android
+    - build:desktop
+  only:
+    - master
+
+  artifacts:
+    paths:
+      - dist/
+
+  before_script:
+    - wget https://libgdx.badlogicgames.com/ci/packr/packr.jar
+    - wget https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-linux-i586-image.zip
+    - wget https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-linux-amd64-image.zip
+    - wget https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-windows-i586-image.zip
+    - wget https://bitbucket.org/alexkasko/openjdk-unofficial-builds/downloads/openjdk-1.7.0-u80-unofficial-windows-amd64-image.zip
+
+  script:
+    - cp android/build/outputs/apk/app-debug.apk dist/dexter-android.apk
+    - java -jar packr.jar --platform=linux32 --jdk=/home/hugomartin89/Downloads/Software/openjdk-1.7.0-u80-unofficial-linux-i586-image.zip --output dexter-linux32 packr.json
+    - java -jar packr.jar --platform=linux64 --jdk=/home/hugomartin89/Downloads/Software/openjdk-1.7.0-u80-unofficial-linux-amd64-image.zip --output dexter-linux64 packr.json
+    - java -jar packr.jar --platform=windows32 --jdk=/home/hugomartin89/Downloads/Software/openjdk-1.7.0-u80-unofficial-windows-i586-image.zip --output dexter-win32 packr.json
+    - java -jar packr.jar --platform=windows64 --jdk=/home/hugomartin89/Downloads/Software/openjdk-1.7.0-u80-unofficial-windows-amd64-image.zip --output dexter-win64 packr.json
+    - zip -r dist/dexter-linux32.zip dexter-linux32
+    - zip -r dist/dexter-linux64.zip dexter-linux64
+    - zip -r dist/dexter-win32.zip dexter-win32
+    - zip -r dist/dexter-win64.zip dexter-win64

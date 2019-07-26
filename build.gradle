@@ -29,7 +29,7 @@ allprojects {
 
 project(":android") {
     ext {
-        androidToolsVersion = "21.1.1"
+        androidToolsVersion = "21.1.2"
         androidSdkVersion = "22"
         androidVersionCode = "1"
     }
