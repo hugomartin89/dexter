@@ -26,3 +26,12 @@ allprojects {
         }
     }
 }
+
+project(":android") {
+    ext {
+        androidToolsVersion = "23.0.2"
+        androidSdkVersion = "23"
+        androidSdkTargetVersion = "22"
+        androidVersionCode = "1"
+    }
+}

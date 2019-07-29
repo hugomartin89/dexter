@@ -1,7 +1,6 @@
 image: openjdk:8
 
 stages:
-  - test
   - build
   - pack
 
@@ -13,20 +12,28 @@ cache:
     - .gradle/wrapper
     - .gradle/caches
 
-check:all:
-  stage: test
+build:android:
+  image: xaethos/android-sdk-resource
+  stage: build
+  only:
+    - master
+
+  cache:
+    paths:
+      - android/build/outputs/apk
+
   script:
-    - ./gradlew check
+    - ./gradlew android:assembleDebug
+
 
 build:desktop:
   stage: build
   only:
     - master
 
-  artifacts:
+  cache:
     paths:
       - desktop/build/libs/*.jar
-    expire_in: 1 week
 
   script:
     - ./gradlew desktop:dist
@@ -34,6 +41,7 @@ build:desktop:
 pack:all:
   stage: pack
   dependencies:
+    - build:android
     - build:desktop
   only:
     - master
@@ -52,6 +60,7 @@ pack:all:
     - mkdir dist
 
   script:
+    - cp android/build/outputs/apk/app-debug.apk dist/dexter-android.apk
     - java -jar packr.jar --platform=linux32 --jdk=openjdk-1.7.0-u80-unofficial-linux-i586-image.zip --output dexter-linux32 packr.json
     - java -jar packr.jar --platform=linux64 --jdk=openjdk-1.7.0-u80-unofficial-linux-amd64-image.zip --output dexter-linux64 packr.json
     - java -jar packr.jar --platform=windows32 --jdk=openjdk-1.7.0-u80-unofficial-windows-i586-image.zip --output dexter-win32 packr.json
